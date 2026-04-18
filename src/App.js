@@ -448,11 +448,12 @@ m.bindTooltip(`
 m.on('click', () => onSel(d));
 mkrRef.current[d.id] = m;
 });
+// eslint-disable-next-line react-hooks/exhaustive-deps
 }, [layer, stateFilter, sel]);
 
 useEffect(() => {
 if (sel && instRef.current) instRef.current.flyTo([sel.lat, sel.lng], 9, { duration:1 });
-}, [onSel, vis]);
+}, [sel]);
 
 return (
 <div className="ctr">
@@ -504,7 +505,7 @@ try {
 const res = await fetch('https://api.anthropic.com/v1/messages', {
 method:'POST',
 headers:{ 'Content-Type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
-body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:700,
+body: JSON.stringify({ model:'claude-3-5-sonnet-20241022', max_tokens:700,
 messages:[{ role:'user', content:`You are a dual expert: a senior MoRD policy analyst AND a CTARA IIT Bombay research associate. Bridge scheme implementation + appropriate technology. Give 4-6 precise data-driven sentences with specific numbers, scheme names, CTARA research themes (water, energy, livelihoods, roads, agriculture), and actionable interventions.\n\nContext: ${ctx}\n\nQuestion: ${q}` }] }),
 });
 if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message||`HTTP ${res.status}`); }
@@ -906,15 +907,34 @@ const [search, setSearch] = useState('');
 const [mapOK, setMapOK] = useState(false);
 
 useEffect(() => {
-const style = document.createElement('style');
-style.textContent = CSS;
-document.head.appendChild(style);
-const css = document.createElement('link');
-css.rel='stylesheet'; css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-document.head.appendChild(css);
+// Inject CSS only once
+if (!document.getElementById('bharat-niti-styles')) {
+  const style = document.createElement('style');
+  style.id = 'bharat-niti-styles';
+  style.textContent = CSS;
+  document.head.appendChild(style);
+}
+// If Leaflet already loaded (StrictMode double-invoke), just set flag
+if (window.L) { setMapOK(true); return; }
+// If script tag already injected, wait for it
+if (document.getElementById('leaflet-js')) {
+  const existing = document.getElementById('leaflet-js');
+  existing.addEventListener('load', () => setMapOK(true));
+  return;
+}
+if (!document.getElementById('leaflet-css')) {
+  const css = document.createElement('link');
+  css.id = 'leaflet-css';
+  css.rel = 'stylesheet';
+  css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  document.head.appendChild(css);
+}
 const js = document.createElement('script');
-js.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-js.onload=()=>setMapOK(true);
+js.id = 'leaflet-js';
+js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+js.crossOrigin = 'anonymous';
+js.onload = () => setMapOK(true);
+js.onerror = () => console.error('Failed to load Leaflet');
 document.head.appendChild(js);
 }, []);
 
