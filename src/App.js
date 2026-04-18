@@ -452,7 +452,7 @@ mkrRef.current[d.id] = m;
 
 useEffect(() => {
 if (sel && instRef.current) instRef.current.flyTo([sel.lat, sel.lng], 9, { duration:1 });
-}, [sel]);
+}, [onSel, vis]);
 
 return (
 <div className="ctr">
