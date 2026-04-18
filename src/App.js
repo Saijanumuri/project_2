@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
 import {
 districts, BENCHMARKS, getConv, getCTARA, getFU,
 distressInfo, pctColor, fmtL, stateList,
@@ -949,6 +950,7 @@ const onSel = d => { setSel(d); setView('Map'); };
 
 return (
 <div className="shell">
+<VercelAnalytics />
 <Header view={view} setView={setView} search={search} setSearch={setSearch} onSearch={onSearch} />
 <KPIBand />
 <div className="body">
