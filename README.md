@@ -2,7 +2,7 @@
 
 > Data-driven intelligence for rural development schemes across India
 
-**CTARA IIT Bombay × Ministry of Rural Development, Government of India**
+**Ministry of Rural Development, Government of India**
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![Bundle Size](https://img.shields.io/badge/bundle-82.71%20KB-blue)]()
